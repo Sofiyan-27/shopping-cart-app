@@ -1,11 +1,11 @@
-__ Shopping Cart Fullstack Application __
+# Shopping Cart Fullstack Application
 
 A fullstack shopping cart system built as per the assignment requirements.
 
-Backend: Go (Gin, Gorm, SQLite)
-Frontend: React (Vite)
-Auth: Token-based (single active token per user = single-device login)
-Database: SQLite via Gorm ORM
+- **Backend:** Go (Gin, Gorm, SQLite)
+- **Frontend:** React (Vite)
+- **Auth:** Token-based (single active token per user = single-device login)
+- **Database:** SQLite via Gorm ORM
 
 The system supports:
 
@@ -16,10 +16,11 @@ The system supports:
 5. Converting cart into an order (`POST /orders`)
 6. Listing Users, Items, Carts (for the logged-in user) and Orders
 
+---
 
+## 🗂 Project Structure
 
-__ Project Structure __
-
+```text
 shopping-cart-app/
 │
 ├── backend/
