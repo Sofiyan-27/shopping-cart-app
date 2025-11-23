@@ -1,0 +1,201 @@
+Backend – How to Run
+
+Requirements:
+-Go 1.21+
+-SQLite 
+
+In terminal run: 
+-cd backend
+-go mod tidy        # download dependencies (first time)
+-go run main.go     # start backend server
+
+The Backend will run at:
+-Base URL : http://localhost:8080
+
+On startup, it will:
+-Connect/create app.db
+-Auto-migrate tables: users, items, carts, cart_items, orders
+-Register all routes
+
+
+FrontEnd - How to run
+
+Requirements:
+-Node.js + npm
+
+In Terminal Run:
+-cd frontend
+-npm install
+-npm run dev
+
+The FrontEnd will run at:
+-URL: http://localhost:5173
+
+The frontend does:
+-Login screen (username + password)
+-On success:
+ -Stores token
+ -Loads Items page
+-Items page:
+ -Lists items from /items
+ -Buttons:
+   -Add to Cart → POST /carts
+   -Cart → GET /carts (shows cart_id + item_ids in alert)
+   -Checkout → POST /orders (order created, shows order_id)
+   -Order History → GET /orders (shows order IDs in alert)
+
+
+Seeding Sample Items : 
+
+One helper endpoint is implemented to quickly populate the items table.
+-Endpoint: POST /seed/items
+-Auth: Not required
+
+Usage (via Postman / Thunder Client):
+-Method: POST
+-URL: http://localhost:8080/seed/items
+
+This will create entries like:
+-Soap
+-Shampoo
+-Toothpaste
+-Juice
+-Biscuits
+
+
+Authentication & Session
+
+-Signup (POST /users) creates a new User.
+-Login (POST /users/login) returns a token.
+-A user always has at most one active token.
+ -Logging in again overwrites the previous token (single-device login).
+-All protected endpoints require header:
+  -Authorization: Bearer <token>
+
+
+API endpoints
+
+1. Signup - POST /users
+Request body:
+{
+  "username": "given-username",
+  "password": "1234"
+}
+
+Response:
+{
+  "id": 1,
+  "username": "given-username",
+  "token": "",
+  "created_at": "...",
+  "updated_at": "..."
+}
+
+2. Login – POST /users/login
+Request body:
+{
+  "username": "given-username",
+  "password": "1234"
+}
+
+Response:
+{
+  "token": "uuid-token-here",
+  "user_id": 1,
+  "username": "given-username"
+}
+
+3. Seed Items – POST /seed/items
+
+Response:
+{
+  "message": "items seeded"
+}
+
+4. List Items – GET /items
+
+Headers:
+Authorization: Bearer <token>
+
+Response:
+[
+  {
+    "id": 1,
+    "name": "Soap",
+    "status": "AVAILABLE",
+    "created_at": "...",
+    "updated_at": "..."
+  }
+]
+
+5. Add to Cart – POST /carts
+
+-A single active cart per user is maintained.
+-If no active cart exists for the user, one is created.
+
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+Request body:
+{
+  "item_id": 1
+}
+
+Response:
+{
+  "message": "item added to cart",
+  "cart_id": 5,
+  "item_id": 1
+}
+
+6. Get Cart – GET /carts
+
+-Returns the current active cart for the logged-in user.
+
+Headers:
+Authorization: Bearer <token>
+
+Response (cart exists):
+{
+  "cart_id": 5,
+  "item_ids": [1, 2, 2]
+}
+
+Response (no active cart):
+{
+  "message": "no active cart"
+}
+
+
+7. Create Order (Checkout) – POST /orders
+
+-Converts the active cart into an order.
+
+Headers:
+Authorization: Bearer <token>
+
+Response:
+{
+  "message": "order created",
+  "order_id": 12
+}
+
+
+8. List Orders – GET /orders
+
+-Returns all orders for the logged-in user.
+
+Headers:
+Authorization: Bearer <token>
+
+Response:
+[
+  {
+    "id": 12,
+    "user_id": 1,
+    "cart_id": 5,
+    "created_at": "...",
+    "updated_at": "..."
+  }
+]
